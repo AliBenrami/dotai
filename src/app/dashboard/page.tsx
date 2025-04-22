@@ -126,6 +126,7 @@ export default function Chatbot() {
       ],
     };
 
+    sendMessageToDB(user);
     setUserMessage("");
     setContents((prev) => [...prev, user]);
     setIsLoading(true);
@@ -143,7 +144,7 @@ export default function Chatbot() {
             },
           ],
         };
-
+        sendMessageToDB(model);
         setContents((prev) => [...prev, model]);
       } catch (error) {
         console.error("Error sending message:", error);

@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter();
 
   const navigateToLogin = () => {
-    router.push("/login");
+    router.push("/signin");
   };
 
   return (
@@ -34,6 +34,29 @@ export default function Home() {
           </ul>
         </div>
       </nav>
+
+      <main className="container mx-auto flex flex-col items-center justify-center h-[calc(100%-76px)] px-4">
+        <div className="text-center">
+          <h1 className="text-5xl font-bold mb-4">Welcome to DotAI</h1>
+          <p className="text-xl mb-8">
+            The intelligent assistant for all your development needs
+          </p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={navigateToLogin}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+            >
+              Get Started
+            </button>
+            <Link
+              href="/about"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors"
+            >
+              Learn More
+            </Link>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
