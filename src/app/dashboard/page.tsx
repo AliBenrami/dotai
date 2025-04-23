@@ -24,12 +24,6 @@ export default function Chatbot() {
   const hasRun = useRef(false);
 
   useEffect(() => {
-    if (!hasRun.current) {
-      hasRun.current = true;
-      getMessageContext();
-    }
-  }, []);
-  useEffect(() => {
     if (chat === undefined) {
       setChat(
         ai.chats.create({
@@ -38,7 +32,7 @@ export default function Chatbot() {
         })
       );
     }
-  }, [chat]);
+  }, [chat, contents]);
 
   const sendMessageToDB = async (currentMessage: Messages) => {
     await supabase
@@ -56,7 +50,7 @@ export default function Chatbot() {
   };
 
   const getChat = async () => {
-    let { data: chatTable } = await supabase
+    const { data: chatTable } = await supabase
       .from("chatTable")
       .select("*")
       .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
@@ -106,6 +100,13 @@ export default function Chatbot() {
         : []
     );
   };
+
+  useEffect(() => {
+    if (!hasRun.current) {
+      getMessageContext();
+      hasRun.current = true;
+    }
+  }, []);
 
   // Auto scroll to bottom whenever messages change
   const scrollToBottom = () => {

@@ -19,19 +19,22 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const { data, error: signInError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (signInError) {
         throw signInError;
       }
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Login failed. Please check your credentials.");
+    } catch (err: Error | unknown) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Login failed. Please check your credentials.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -130,17 +133,15 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-400">
-            Don't have an account?{" "}
-            <Link
-              href="/signup"
-              className="font-medium text-indigo-400 hover:text-indigo-300"
-            >
-              Sign up
-            </Link>
-          </p>
-        </div>
+        <p className="text-sm text-gray-400">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/signup"
+            className="font-medium text-indigo-400 hover:text-indigo-300"
+          >
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );
