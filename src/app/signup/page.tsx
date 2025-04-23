@@ -1,40 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../components/supabaseClient";
 import Nav from "../components/nav";
 
-const LoginPage = () => {
+const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rePassword, setRePassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const router = useRouter();
-
-  // Check if user is already signed in when component mounts
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data } = await supabase.auth.getSession();
-
-      if (data.session) {
-        // User is already logged in, redirect to dashboard
-        router.push("/dashboard");
-      }
-    };
-
-    checkUser();
-  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
+    if (password !== rePassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return -1;
+    }
+
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signUp({
         email,
         password,
       });
@@ -48,7 +41,7 @@ const LoginPage = () => {
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "Login failed. Please check your credentials.";
+          : "signup failed. Please check your credentials.";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -61,7 +54,7 @@ const LoginPage = () => {
       <div className="flex min-h-screen items-center justify-center bg-gray-900 text-gray-100">
         <div className="w-full max-w-md rounded-xl bg-gray-800 p-8 shadow-lg border border-gray-700">
           <h2 className="mb-6 text-center text-2xl font-bold text-white">
-            Welcome Back
+            Create Account
           </h2>
 
           {error && (
@@ -97,18 +90,32 @@ const LoginPage = () => {
                 >
                   Password
                 </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-indigo-400 hover:text-indigo-300"
-                >
-                  Forgot password?
-                </Link>
               </div>
               <input
                 type="password"
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="pl-2 mt-1 block w-full h-8 rounded-md border-gray-600 bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-white"
+                required
+                placeholder="••••••••"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="repassword"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Confirm Password
+                </label>
+              </div>
+              <input
+                type="password"
+                id="repassword"
+                value={rePassword}
+                onChange={(e) => setRePassword(e.target.value)}
                 className="pl-2 mt-1 block w-full h-8 rounded-md border-gray-600 bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-white"
                 required
                 placeholder="••••••••"
@@ -145,18 +152,18 @@ const LoginPage = () => {
                   Processing...
                 </span>
               ) : (
-                "Sign In"
+                "Sign up"
               )}
             </button>
           </form>
 
           <p className="mt-4 text-sm text-gray-400">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/signup"
+              href="/signin"
               className="font-medium text-indigo-400 hover:text-indigo-300"
             >
-              Sign up
+              Sign in
             </Link>
           </p>
         </div>
@@ -165,4 +172,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

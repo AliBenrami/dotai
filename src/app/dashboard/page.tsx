@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { ai } from "../gemini";
-import { supabase } from "../supabaseClient";
+import { ai } from "../components/gemini";
+import { supabase } from "../components/supabaseClient";
 import ReactMarkdown from "react-markdown";
 import { Chat } from "@google/genai";
 import { UUIDTypes, v4 as uuidv4 } from "uuid";
@@ -20,6 +20,7 @@ export default function Chatbot() {
   const [chat, setChat] = useState<Chat | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chatId, setChatId] = useState<UUIDTypes | undefined>();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasRun = useRef(false);
 
@@ -102,9 +103,20 @@ export default function Chatbot() {
   };
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getUser();
+      console.log(data);
+      if (!data.user) {
+        window.location.href = "/login";
+      } else {
+        setIsAuthenticated(true);
+      }
+    };
+
     if (!hasRun.current) {
       getMessageContext();
       hasRun.current = true;
+      checkAuth();
     }
   }, []);
 
@@ -187,6 +199,16 @@ export default function Chatbot() {
       </div>
     );
   };
+
+  // Don't render chat interface until authentication is confirmed
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-900">
+        <div className="w-16 h-16 border-4 border-t-blue-500 border-gray-700 rounded-full animate-spin"></div>
+        <p className="text-white mt-4">Checking authentication...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col bg-gray-900 w-screen h-screen overflow-hidden">
